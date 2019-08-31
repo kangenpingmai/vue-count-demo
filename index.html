@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="./vue.js"></script>
+  <script src="./vuex.js"></script>
+</head>
+<body>
+  <div id="root">
+    <button @click="decrement">-</button>
+    {{count}}
+    <button @click="increment">+</button>
+    <button @click="dispatchAction">async++</button>
+  </div>
+</body>
+</html>
+<script>
+  Vue.use(Vuex)
+
+  const {mapState, mapMutations, mapActions} = Vuex
+
+  //创建store Vuex.Store redux中是createStore
+
+  const store = new Vuex.Store({
+    state: {
+      count: 0
+    },
+    actions: {
+      // 做异步操作
+      incrementAsync (store) {
+        setTimeout(() => {
+          store.commit('increment')
+        }, 1000);
+      }
+    },
+    mutations: {
+      //mutations中只能做同步操作
+      increment (state) {
+        //vuex中是直接改变了state的值， 而redux中是返回一个新的state
+        state.count++
+      },
+      decrement (state) {
+        state.count--
+      }
+    }
+  })
+
+  
+
+  let vm = new Vue({
+    store,
+    el: '#root',
+    // computed: {
+    //   count () {
+    //     return this.$store.state.count
+    //   }
+    // },
+    computed: mapState(['count']),
+    methods: {
+      ...mapMutations(['increment', 'decrement']),
+      dispatchAction () {
+        this.$store.dispatch('incrementAsync')
+      }
+    }
+  })
+    
+</script>
