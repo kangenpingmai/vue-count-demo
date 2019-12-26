@@ -1,1 +1,1 @@
-# vue-count-demo
+# vuex-count-demo
