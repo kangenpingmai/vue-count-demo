@@ -5,18 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
-  <script src="./vue.js"></script>
-  <script src="./vuex.js"></script>
+  
 </head>
 <body>
   <div id="root">
     <button @click="decrement">-</button>
-    {{count}}
+    state.count: {{countVuex}}
     <button @click="increment">+</button>
-    <button @click="dispatchAction">async++</button>
+    <button @click="dispatchAction">异步加6</button>
+    <div>
+      <span>再state.count基础上加6：</span>
+      <span>{{otherCount}}</span>
+    </div>
   </div>
 </body>
 </html>
+<script src="./vue.js"></script>
+<script src="./vuex.js"></script>
 <script>
   Vue.use(Vuex)
 
@@ -30,9 +35,9 @@
     },
     actions: {
       // 做异步操作
-      incrementAsync (store) {
+      Asyncincrement (store) {
         setTimeout(() => {
-          store.commit('increment')
+          store.commit('incrementAsync', 6)
         }, 1000);
       }
     },
@@ -44,7 +49,11 @@
       },
       decrement (state) {
         state.count--
+      },
+      incrementAsync(state, payload) {
+        state.count += payload
       }
+
     }
   })
 
@@ -53,16 +62,35 @@
   let vm = new Vue({
     store,
     el: '#root',
+    data: {
+      number: 6
+    },
+    //一
     // computed: {
     //   count () {
     //     return this.$store.state.count
     //   }
     // },
-    computed: mapState(['count']),
+
+    //二
+    // computed: mapState(['count']),
+    
+    //三
+    computed: {
+      ...mapState({
+        countVuex: 'count',
+        // 用箭头函数会穿透到外层vuex中，找不到number
+        otherCount(state) {
+          return state.count + this.number
+        }
+      })
+    },
+
+    //mapMutations将上面vuex中mutations定义的方法引用
     methods: {
       ...mapMutations(['increment', 'decrement']),
       dispatchAction () {
-        this.$store.dispatch('incrementAsync')
+        this.$store.dispatch('Asyncincrement')
       }
     }
   })
